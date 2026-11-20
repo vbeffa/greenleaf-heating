@@ -1,3 +1,4 @@
+# Local editor / backup files
 *~
 *.swp
 *.swo
@@ -9,6 +10,8 @@
 Thumbs.db
 __pycache__/
 *.pyc
+
+# Local secrets and runtime data
 .env
 .env.*
 !.env.example

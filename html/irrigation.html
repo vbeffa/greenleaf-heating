@@ -1,0 +1,866 @@
+<HTML>
+<HEAD>
+<TITLE>20917 Greenleaf Irrigation</TITLE>
+<style>
+body, tr, td, input, select, p { font-family: Verdana; font-size: 13pt;};
+.aa {position:relative;top:20px;font-family:Verdana;font-size:32px;color:white;font-weight:800;}
+.b {font-family:Verdana;font-size:20px; font-weight:800;};
+.t1 {padding-top:-30px;font-family:Verdana;font-size:32px;color:white;font-weight:800;};
+</style>
+<script src="js/jquery.min.js" type="text/javascript"></script>
+<script>
+function getCookie(cname) { var name = cname + "="; var ca = document.cookie.split(';'); for(var i=0; i<ca.length; i++) 
+ {var c = ca[i]; while (c.charAt(0)==' ') c = c.substring(1); if (c.indexOf(name) != -1) return c.substring(name.length,c.length);} return ""; } 
+var loginok = getCookie("loginok");
+//if(loginok == 1)
+//   window.onbeforeunload = execut;
+var sp = [ ]; //  id, nume, valoare, pozitie
+var bf = [ ]; //  id,name,value,time,port,position,io_card,op,lastval,START_TIME,RUN_TIME,mon,tue,wed,thu,fri,san,sun = 18
+var rdp = [ ];// enable, auto, value, rain_level, rain_threshold 
+var t_status = '';
+var t_value = '';
+var NN = 18;
+var NTOT = 0;
+var activa = 0;
+var totale = 0;
+var blocaj = 0;
+function solutie_blocaj()
+{
+	var a = document.getElementById('blocaj');
+	if(blocaj == 1)
+		a.innerHTML = "<table style='border:1px solid #500; background: #ffa;width:150px;' cellpassind=2 cellspacing=2><tr><td><font font-face=Verdane color=#000 size=-1><center>Please wait</center></td></tr></table>";
+	else
+		a.innerHTML = "";
+	return;
+}
+function initu()
+{
+   if(blocaj == 1)
+   	return solutie_blocaj();  	
+   puntm();
+   var b = "getAny.cgi?oper=spr&tip=a&x=" + Math.random();
+   var runok = $.ajax({ url: b, data: "", dataType:"text", async: false }).responseText;
+   var ob = runok.split("|");
+   for(var i = 0; i < ob.length; i++)
+      sp[i] = ob[i];
+   var b = "getAny.cgi?oper=spr&tip=s&x=" + Math.random();
+   var runok1 = $.ajax({ url: b, data: "", dataType:"text", async: false }).responseText;
+   var ob = runok1.split("|");
+   for(var i = 0; i < ob.length; i++)
+      bf[i] = ob[i];
+   NTOT = ob.length;
+   var a1 = '';
+   activa = 3;
+   var b1 = "getAny.cgi?oper=spr&tip=t&x=" + Math.random();
+   var runok2 = $.ajax({ url: b1, data: "", dataType:"text", async: false }).responseText;
+   var ob2 = runok2.split("|");
+   t_status = ob2[0];
+   t_value = ob2[1];
+   
+   var b = "getAny.cgi?oper=spr&tip=r&x=" + Math.random();
+   var runok1 = $.ajax({ url: b, data: "", dataType:"text", async: false }).responseText;
+   //alert(runok1);
+   var ob = runok1.split("|");
+   for(var i = 0; i < ob.length; i++)
+      rdp[i] = ob[i];
+   
+   faceva();
+}
+function faceva()
+{
+   if(blocaj == 1)
+   	return solutie_blocaj();  	
+   var j = activa * NN;
+   var a = document.getElementById('name'); 
+   var b = document.getElementById('bstatus'); 
+   var c = document.getElementById('ampm'); 
+   if(activa > 0)
+   {
+      a.disabled = true;
+      b.disabled = false;
+      c.disabled = false;
+   }
+   else
+   {
+      b.disabled = true;
+      a.disabled = false;
+      c.disabled = true;
+   }
+   a = document.getElementById('status'); 
+   b = 'images/t_' + ((t_status == '1') ? 'on' : 'off') + '.jpg';
+   a.src = b; 
+   a = document.getElementById('imga'); a.src = (activa > 0) ? 'images/Back_Sprinklers.jpg' : 'images/Front_Sprinklers.jpg';
+/*
+   a = document.getElementById('imga1');
+   if(activa == 0)
+   {
+      var a1 = [];
+      for(i = 0; i < 5; i++)
+         if(sp[2 + 4 * i] == 0)
+            a1[i] = ' opacity: 0.4; filter: alpha(opacity=40) ';
+         else
+            a1[i] = '';
+      a.innerHTML = '<IMG SRC="images/one.gif" style="position:relative; top:-220px; left:-50px;' + a1[0] + '">' +
+      '<IMG SRC="images/two.gif" style="position:relative; top:-400px; left:65px;' + a1[1] + '">' +
+      '<IMG SRC="images/three.gif" style="position:relative; top:-220px; left:170px;' + a1[2] + '">' +
+      '<IMG SRC="images/four.gif" style="position:relative; top:-220px; left:10px;' + a1[3] + '">' +
+      '<IMG SRC="images/five.gif" style="position:relative; top:-220px; left:-140px;' + a1[4] + '">';
+   }
+   else
+   {
+      var a1 = [];
+      for(i = 0; i < 3; i++)
+         if(sp[22 + 4 * i] == 0)
+            a1[i] = ' opacity: 0.4; filter: alpha(opacity=40) ';
+         else
+            a1[i] = '';
+      a.innerHTML = '<IMG SRC="images/one.gif" style="position:relative; top:-246px; left:-110px;' + a1[0] + '">' +
+      '<IMG SRC="images/two.gif" style="position:relative; top:-246px; left:-10px;' + a1[1] + '">' +
+      '<IMG SRC="images/three.gif" style="position:relative; top:-140px; left:-130px;' + a1[2] + '">';
+   }
+*/
+   a = document.getElementById('start'); 
+   var w = t_value.substring(0, 5);
+
+      var h = Number(w.substring(0, 2));
+      var m = Number(w.substring(3, 5));
+      var q1 = document.getElementById('ampm');
+      q1.disabled = false;
+      if(h <= 12)
+         q1.selectedIndex = 0;
+      else
+      {
+         h -= 12;
+         q1.selectedIndex = 1;
+      }
+      var w = '';
+      if(h < 9)
+         w = '0';
+      w += h + ':';
+      if(m < 9)
+         w += '0';
+      w += m;
+      a.value = w;
+      a.disabled = false;
+
+   a = document.getElementById('hid1'); if(activa > 0) a.style.visibility = 'visible'; else a.style.visibility = 'hidden';
+   a = document.getElementById('hid2'); if(activa > 0) a.style.visibility = 'visible'; else a.style.visibility = 'hidden';
+   j = 3;
+   if(activa > 0)
+      j = 5;
+   for(i = 0; i < j; i++)
+   {
+      a = document.getElementById('rtime' + (i + 1));
+      a.innerHTML = '<CENTER><FONT class=b COLOR="#0000FF"><B>' + bf[activa * NN + 10 + i * NN] + '</B></CENTER>';
+   }
+   for(i = 0; i < j; i++)
+   {
+      var tt = 0;
+      for(k = 0; k < 7; k++)
+      {
+         var c = bf[activa * NN + 11 + k + NN * i];
+         var e = document.getElementById('cb' + (i + 1) + '' + (k + 1));
+         if(c == '1')
+         {
+            e.src = 'images/check2.jpg';
+            tt++;
+         }
+         else
+            e.src = 'images/check3.jpg';
+      }
+      var e = document.getElementById('cb' + (i + 1) + '0');
+      if(tt == 7)
+         e.src = 'images/check2.jpg';
+      else
+         e.src = 'images/check3.jpg';
+   }
+   farun();
+   
+   if(rdp[0] != '1')//rain delay off
+   {
+   		a = document.getElementById('rd');
+   		a.innerHTML = '<FONT COLOR=#FFFFFF size=+1>RAIN DELAY: OFF</FONT>';
+   		
+   		a = document.getElementById('rl');
+   		a.innerHTML = '<FONT COLOR=#FFFFFF size=+1>FORECAST: ' + rdp[3]+ 'mm</FONT>';
+   }
+   else {
+   	if(rdp[1] != '1')//manual
+   	{
+   		a = document.getElementById('rd');
+   		a.innerHTML = '<FONT COLOR=#FFFFFF size=+1>RAIN DELAY: MAN, DAYS: ' + rdp[2] +'</FONT>';
+   		
+   		a = document.getElementById('rl');
+   		a.innerHTML = '<FONT COLOR=#FFFFFF size=+1>FORECAST: ' + rdp[3]+ 'mm</FONT>';
+   	}
+   	else {
+   		if(rdp[3] > rdp[4])//today rain level bigger than the threshold
+   		{
+   			rdp[2] = '1';
+   		}
+   		else {
+   			rdp[2] = '0';
+   		}
+   		a = document.getElementById('rd');
+   		a.innerHTML = '<FONT COLOR=#FFFFFF size=+1>RAIN DELAY: AUTO, DAYS: ' + rdp[2] +'</FONT>';
+   		
+   		a = document.getElementById('rl');
+   		a.innerHTML = '<FONT COLOR=#FFFFFF size=+1>FORECAST: ' + rdp[3]+ 'mm</FONT>';
+   	}
+   }
+}
+function farun()
+{
+   var i, j;
+   totale = 0;
+   for(i = 0; i < 8; i++)
+      if(sp[2 + 4 * i] == '1')
+         totale++;
+   j = 3;
+   if(activa > 0)
+      j = 5;
+   for(i = 0; i < j; i++)
+   {
+      var a = document.getElementById("run" + (i + 1));
+      if(sp[activa * 4 + 4 * i + 2] == '1')
+      {
+         a.style.opacity = '1';
+         a.style.backgroundImage = 'url(images/sp_on.gif)';
+      }
+      else
+      {
+         if(totale == 0)
+            a.style.opacity = '1';
+         else
+            a.style.opacity = '0.5';
+         a.style.backgroundImage = 'url(images/sp0.gif)';
+      }
+   }
+}
+function ccb(i, j)
+{
+   if(blocaj == 1)
+   	return solutie_blocaj();  	
+   var j11 = activa * NN;
+   if(loginok != 1)
+   {
+      alert("Guest access is limited");
+      return true;
+   }
+   var e = document.getElementById('cb' + i + '' + j);
+   var f = e.src;
+        var g = f.indexOf('images/');
+        if(g > 0)
+                g += 7;
+        g = (f.indexOf('3', g) > 0) ? '1' : '0';
+        var gg = (g == '1') ? 'images/check2.jpg' : 'images/check3.jpg';            
+   e.src = gg;
+   if(j > 0)
+   {
+      var d6 = j11 + 11 + (i - 1) * NN + (j - 1);
+      var g1 = bf[d6];
+      bf[d6] = g;
+      if(g == '0')
+      {
+         e = document.getElementById('cb' + i + '0'); 
+         e.src = gg;
+      }
+   }
+   if(j == 0)
+   {
+      for(var k = 1; k < 8; k++)
+      {
+         e = document.getElementById('cb' + i + '' + k); 
+         e.src = gg;
+         bf[j11 + 11 + (i - 1) * NN + k - 1] = g;
+      }
+   }
+}
+function altafata()
+{
+   if(blocaj == 1)
+   	return solutie_blocaj();  	
+   if(activa == 0)
+      activa = 3;
+   else
+      activa = 0;
+   faceva();
+}
+function incre(i, inc)
+{
+   if(blocaj == 1)
+   	return solutie_blocaj();  	
+   var j = activa * NN;
+   if(loginok != 1)
+   {
+      alert("Guest access is limited");
+      return true;
+   }
+   var k = Number(bf[j + 10 + (i - 1) * NN]);
+   k += inc;
+   if(k >= 0)
+   {
+      bf[j + 10 + (i - 1) * NN] = k;
+      var a = document.getElementById('rtime' + i); 
+      a.innerHTML = '<CENTER><FONT class=b COLOR="#0000FF"><b>' + bf[j + 10 + (i - 1) * NN] + '</b></CENTER>';
+   }
+}
+function modif()
+{
+   var o = document.getElementById("start");
+   if(blocaj == 1)
+   	return solutie_blocaj();  	
+   if(loginok != 1)
+   {
+      alert("Guest access is limited");
+      return true;
+   }
+   var v = o.value;
+   var a = document.getElementById('ampm');
+   var h = Number(v.substring(0, 2));
+   var m = Number(v.substring(3, 5));
+   if(h >= 12)
+   {
+      h = h % 12;
+      var c1 = "";
+      if(h < 10)
+         c1 = "0";
+      c1 = c1 + h + ":";
+      if(m < 10)
+         c1 += "0";
+      o.value = c1 + m;
+   }  
+   if(a.selectedIndex == 1)
+      h += 12;
+   var w = '';
+   if(h < 9)
+      w = '0';
+   w += h + ':';
+   if(m < 9)
+      w += '0';
+   w += m;
+   var j = 0;
+   t_value = w + ':00';
+}
+function cstat()
+{
+   if(loginok != 1)
+   {
+      alert("Guest access is limited");
+      return true;
+   }
+   var j = 1 * NN;
+//   if(confirm(a1))
+   {
+      a = document.getElementById('status'); 
+      if(t_status == '0')
+         t_status = '1';
+      else
+         t_status = '0';
+      var b = 'images/t_' + ((t_status == '1') ? 'on' : 'off') + '.jpg';
+      a.src = b; 
+//      var b = "setAny.cgi?oper=spr&tip=id&id=" + t_status + '&v=' + t_value;
+//      var runok = $.ajax({ url: b, data: "", dataType:"text", async: false }).responseText;
+//      initu();
+   }
+}
+function execut()
+{
+   if(blocaj == 1)
+   	return solutie_blocaj();  	
+   if(loginok != 1)
+      return true;
+
+   var v = document.getElementById('start').value;
+   var a = document.getElementById('ampm');
+   var h = Number(v.substring(0, 2));
+   var m = Number(v.substring(3, 5));
+   if(a.selectedIndex == 1)
+      h += 12;
+   var w = '';
+   if(h < 9)
+      w = '0';
+   w += h + ':';
+   if(m < 9)
+      w += '0';
+   w += m;
+   var j = activa * NN;
+   bf[9] = w + ':00';
+   var b = "setAny.cgi?oper=spr&tip=s&s=";
+   var s = "";
+   for(var i = 0; i < NTOT; i++)
+      s += bf[i] + '|';
+   b += s + "&x=" + Math.random();
+   var runok = $.ajax({ url: b, data: "", dataType:"text", async: false }).responseText;
+   alert(runok);
+   var b = "setAny.cgi?oper=spr&tip=id&id=" + t_status + '&v=' + t_value;
+   var runok = $.ajax({ url: b, data: "", dataType:"text", async: false }).responseText;
+}
+function alterd(i)
+{
+   if(loginok != 1)
+   {
+      alert("Guest access is limited");
+      return true;
+   }
+   var a = "";
+   var k = activa * 4;
+   if(sp[k + 2 + 4 * (i - 1)] == '1')
+      a = 'ON';
+   else
+      a = 'OFF';
+   if(totale > 0 && sp[k + 2 + 4 * (i - 1)] == '0')
+      return;
+//   if(confirm("Turn " + a + " station #" + i + " ?"))
+   {
+	var cc = (a == 'ON') ? 0 : 1;
+	var cccopy = (a == 'ON') ? 1 : 0;
+	var b = "setAny.cgi?oper=spr&tip=z&z=" + sp[k + 4 * (i - 1)] + "&v=" + cc + "&x=" + Math.random();
+//      var b = "setsprinkler.cgi?sprinkler=" + sp[k + 4 * (i - 1)] + "&actiune=" + cc + "&x=" + Math.random();
+        sp[k + 2 + 4 * (i - 1)] = '' + cc;
+        farun(); 
+	blocaj = 1;
+	solutie_blocaj();
+        var runok = $.ajax({ url: b, data: "", dataType:"text", async: false }).responseText;
+//alert(runok);
+        blocaj = 0;
+        solutie_blocaj();
+        if(runok.indexOf("KO") < 0)
+        {
+           sp[k + 2 + 4 * (i - 1)] = '' + cc;
+           farun();
+      	   t_status = '1';
+	   //cstat();//opreste timer, comentat
+	   puntm();
+        }
+        else
+        {
+           sp[k + 2 + 4 * (i - 1)] = '' + cccopy;
+           farun();
+        }
+   }
+}
+var timpc1 = 0;
+function ceteste()
+{
+   if(blocaj == 1)
+   	return solutie_blocaj();  	
+   timpc1 += 2;
+   var b = "getAny.cgi?oper=spr&tip=a&x=" + Math.random();
+   var runok = $.ajax({ url: b, data: "", dataType:"text", async: false }).responseText;
+//alert(runok);
+   var ob = runok.split("|");
+   for(var i = 0; i < ob.length; i++)
+      sp[i] = ob[i];
+   if(activa == 0)
+   {
+      var a1 = [];
+      for(i = 0; i < 3; i++)
+         if(sp[2 + 4 * i] == 0)
+            a1[i] = ' opacity: 0.4; filter: alpha(opacity=40) ';
+         else
+            a1[i] = '';
+//      a.innerHTML = '<IMG SRC="images/one.gif" style="position:relative; top:-220px; left:-50px;' + a1[0] + '">' +
+//      '<IMG SRC="images/two.gif" style="position:relative; top:-400px; left:65px;' + a1[1] + '">' +
+//      '<IMG SRC="images/three.gif" style="position:relative; top:-220px; left:170px;' + a1[2] + '">' +
+//      '<IMG SRC="images/four.gif" style="position:relative; top:-220px; left:10px;' + a1[3] + '">' +
+//      '<IMG SRC="images/five.gif" style="position:relative; top:-220px; left:-140px;' + a1[4] + '">';
+   }
+   else
+   {
+      var a1 = [];
+      for(i = 0; i < 5; i++)
+         if(sp[activa * 4 + 4 * i] == 0)
+            a1[i] = ' opacity: 0.4; filter: alpha(opacity=40) ';
+         else
+            a1[i] = '';
+//      a.innerHTML = '<IMG SRC="images/one.gif" style="position:relative; top:-246px; left:-110px;' + a1[0] + '">' +
+//      '<IMG SRC="images/two.gif" style="position:relative; top:-246px; left:-10px;' + a1[1] + '">' +
+//      '<IMG SRC="images/three.gif" style="position:relative; top:-140px; left:-130px;' + a1[2] + '">';
+   }
+   farun();
+}
+function puntm()
+{
+   var ad = [ 'Sun', 'Mon','Thu','Wed','Thu','Fri','Sat','7' ];
+   timpc1 = 0;
+   var q1 = document.getElementById('timpc');
+   var cd = new Date();
+   var day = cd.getDate();
+   var d1 = cd.getDay();
+   var month = cd.getMonth() + 1;
+   var year = cd.getFullYear();
+   var ho = cd.getHours();
+   var suffix = "AM";
+   if (ho >= 12) { suffix = "PM";   ho -= 12; }
+   if (ho == 0) ho = 12;
+   var s2 =cd.getMinutes();
+   var tm1 = ho + ':' + ((s2 > 9) ? s2 : '0' + s2) + ' ' + suffix;
+   q1.innerHTML =  '<FONT COLOR=#FFFFFF size=+1> ' + ad[d1] + ', ' + month + '/' + day + '/' + year + ' ' +  tm1 + '</FONT>';
+}
+var activa = 4;
+var v_activa;
+function initb()
+{
+	v_activa = document.getElementById("alfa");
+	if(v_activa)
+	{
+		v_activa.style.background = "#cdcdcd";
+		v_activa.style.cursor = "";
+	}
+}
+function changeA(o, i)
+{
+	var a = [ "home.html", "heating.html", "__cooling.html", "security.html", "irrigation.html", "setup.html", "__contact.html", "docs.html" ];
+	if(i != activa)
+	{
+		if(v_activa)
+		{
+			v_activa.style.background = "#efefef";
+			v_activa.style.cursor = "pointer";
+		}
+		o.style.background = "#cdcdcd";
+		o.style.cursor = "";
+		activa = i;
+		v_activa = o;
+		document.location = a[activa];
+	}
+}
+setInterval(ceteste, 60000);
+setInterval(puntm, 60000);
+</script>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF" leftmargin=0 topmargin=0 onLoad='initb();initu();'>
+<P><TABLE BORDER=0 CELLSPACING=0 CELLPADDING=0>
+   <TR>
+      <TD WIDTH=1130>
+         <CENTER><TABLE BORDER=1 CELLSPACING=0 CELLPADDING=2 WIDTH="100%">
+            <TR>
+               <TD onClick='changeA(this, 0)' style='cursor:pointer; background-color: #efefef;'><CENTER>HOME</CENTER></TD>
+               <TD onClick='changeA(this, 1)' style='cursor:pointer; background-color: #efefef;'><CENTER>CLIMATE</CENTER></TD>
+               <TD onClick='changeA(this, 3)' style='cursor:pointer; background-color: #efefef;'><CENTER>SECURITY</CENTER></TD>
+               <TD onClick='changeA(this, 4)' id=alfa style='cursor:pointer; background-color: #efefef;'><CENTER>IRRIGATION</CENTER></TD>
+               <TD onClick='changeA(this, 5)' style='cursor:pointer; background-color: #efefef;'><CENTER>SETTINGS</CENTER></TD>
+               <TD onClick='changeA(this, 7)' style='cursor:pointer; background-color: #efefef;'><CENTER>DOCS</CENTER></TD>
+            </TR>
+         </TABLE>
+          </CENTER>
+      </TD>
+   </TR>
+   <TR>
+      <TD WIDTH=1130>
+
+
+
+
+
+
+
+
+<TABLE BORDER=0 CELLSPACING=0 CELLPADDING=0>
+   <TR>
+      <TD WIDTH=1130>
+         <TABLE BORDER=0 CELLSPACING=0 WIDTH="100%">
+            <TR>
+               <TD VALIGN=top>
+                  <CENTER><TABLE BORDER=0 CELLSPACING=0>
+                     <TR>
+                        <TD>
+                           <CENTER><TABLE BORDER=0 CELLSPACING=0 WIDTH="100%">
+                              <TR>
+                                 <TD><CENTER><INPUT TYPE=button id=name VALUE="BACK" style="font-size:17pt;" onClick='altafata();'></CENTER></TD>
+                                 <TD><CENTER><INPUT TYPE=button id=bstatus VALUE="FRONT" style="font-size:17pt;" onClick='altafata();'></CENTER></TD>
+                              </TR>
+                           </TABLE>
+                            </CENTER>
+                        </TD>
+                     </TR>
+                     <TR>
+                        <TD><CENTER>
+                           <img  id=imga src='images/Back_Sprinklers.jpg'>
+                           <DIV id=imga1></DIV></CENTER>
+                        </TD>
+                     </TR>
+                     <!--TR>
+                        <TD WIDTH=402><IMG SRC="images/cleardot.gif" WIDTH=20 HEIGHT=20 BORDER=0 ALIGN=bottom></TD>
+                     </TR-->
+                     <TR>
+                        <TD>
+                           <CENTER><TABLE BORDER=0 CELLSPACING=0 WIDTH="100%" style='margin-top: 0px;'>
+                              <TR>
+                                 <TD bgcolor=#353535><FONT COLOR=#FFFFFF size=+1>START:</FONT></TD>
+                                 <TD bgcolor=#353535><INPUT TYPE=text id=start VALUE="" maxlength=5 onChange='modif();' style='text-align:center; width:80px;'></TD>
+                                 <TD bgcolor=#353535><select id=ampm onChange='modif();'><option value=AM>AM</option><option value=PM>PM</option></select></TD>
+                                 <TD bgcolor=#353535><FONT COLOR=#FFFFFF size=+1>TIMER:</FONT></TD>
+                                 <TD bgcolor=#353535><img src='images/t_on.jpg' id = status style='cursor:pointer' border=0 onClick='cstat();'>
+                                 </TD>
+                              </TR>
+                              <TR>
+                                 <TD bgcolor=#353535 colspan=2><FONT COLOR=#FFFFFF size=+1>CURRENT TIME:</FONT></TD>
+                                 <TD bgcolor=#353535 colspan=4 id=timpc></TD>
+                              </TR>
+                              <TR>
+                              	<TD bgcolor=#353535 colspan=3 id=rd><FONT COLOR=#FFFFFF size=+1>RAIN DELAY: </FONT></TD>
+                              	<TD bgcolor=#353535 colspan=2 id=rl><FONT COLOR=#FFFFFF size=+1>FORECAST: </FONT></TD>
+                              </TR>
+                           </TABLE>
+                            
+                           </CENTER>
+                        </TD>
+                     </TR>
+                  </TABLE>
+                   </CENTER>
+               </TD>
+               <TD VALIGN=top>
+                  <CENTER><TABLE BORDER=0 CELLSPACING=2 CELLPADDING=0 WIDTH="100%">
+                     <TR>
+                        <TD><CENTER>STATION</CENTER></TD>
+                        <TD WIDTH=120><CENTER>RUN&nbsp;(MIN)</CENTER></TD>
+                        <TD><CENTER>DAYS</CENTER></TD>
+                     </TR>
+                     <TR BGCOLOR="#666666">
+                        <TD COLSPAN=3><IMG SRC="images/cleardot.gif" WIDTH=1 HEIGHT=1 ALIGN=bottom></TD>
+                     </TR>
+                     <TR>
+                        <TD valign=bottom><CENTER><div id =run1 style='width:80px;height:80px;background:url(images/q.gif);cursor:pointer;' onClick='alterd(1);'>
+		<div style='position:relative;top:20px;font-family:Verdana;font-size:32px;color:white;font-weight:800;'>1</div></div></CENTER></TD>
+                        <TD VALIGN=bottom WIDTH=120>
+                           <CENTER><TABLE BORDER=0 CELLSPACING=0>
+                              <TR>
+                                 <TD id=rtime1 width=50></TD>
+                                 <TD><CENTER>
+                                    <div style='background: url(images/sprinklers2.jpg) 0 0; height:39; width:54; overflow: hidden;cursor:pointer;' onClick='incre(1,1);'></div>
+                                    <div style='background: url(images/sprinklers2.jpg) 0 39px; height:39; width:54; overflow: hidden;cursor:pointer;' onClick='incre(1,-1);'></div>
+                                 </CENTER></TD>
+                              </TR>
+                           </TABLE>
+                            </CENTER>
+                        </TD>
+                        <TD VALIGN=top>
+                           <TABLE BORDER=0 WIDTH="100%">
+                              <TR>
+                                 <TD><CENTER>ALL</CENTER></TD>
+                                 <TD><CENTER>MON</CENTER></TD>
+                                 <TD><CENTER>TUE</CENTER></TD>
+                                 <TD><CENTER>WED</CENTER></TD>
+                                 <TD><CENTER>THU</CENTER></TD>
+                                 <TD><CENTER>FRI</CENTER></TD>
+                                 <TD><CENTER>SAT</CENTER></TD>
+                                 <TD><CENTER>SUN</CENTER></TD>
+                              </TR>
+                              <TR>
+                                 <TD><IMG SRC="images/check3.jpg" WIDTH=51 HEIGHT=51 ALIGN=bottom id=cb10 onClick='ccb(1,0);' style='cursor:pointer;'></TD>
+                                 <TD><IMG SRC="images/check3.jpg" WIDTH=51 HEIGHT=51 ALIGN=bottom id=cb11 onClick='ccb(1,1);' style='cursor:pointer;'></TD>
+                                 <TD><IMG SRC="images/check3.jpg" WIDTH=51 HEIGHT=51 ALIGN=bottom id=cb12 onClick='ccb(1,2);' style='cursor:pointer;'></TD>
+                                 <TD><IMG SRC="images/check3.jpg" WIDTH=51 HEIGHT=51 ALIGN=bottom id=cb13 onClick='ccb(1,3);' style='cursor:pointer;'></TD>
+                                 <TD><IMG SRC="images/check3.jpg" WIDTH=51 HEIGHT=51 ALIGN=bottom id=cb14 onClick='ccb(1,4);' style='cursor:pointer;'></TD>
+                                 <TD><IMG SRC="images/check3.jpg" WIDTH=51 HEIGHT=51 ALIGN=bottom id=cb15 onClick='ccb(1,5);' style='cursor:pointer;'></TD>
+                                 <TD><IMG SRC="images/check3.jpg" WIDTH=51 HEIGHT=51 ALIGN=bottom id=cb16 onClick='ccb(1,6);' style='cursor:pointer;'></TD>
+                                 <TD><IMG SRC="images/check3.jpg" WIDTH=51 HEIGHT=51 ALIGN=bottom id=cb17 onClick='ccb(1,7);' style='cursor:pointer;'></TD>
+                              </TR>
+                           </TABLE>
+                            
+                        </TD>
+                     </TR>
+                     <TR>
+                        <TD valign=bottom>
+                           <CENTER><div id =run2 style='width:80px;height:80px;background:url(images/q.gif);cursor:pointer;' onClick='alterd(2);''>
+		<div style='position:relative;top:20px;font-family:Verdana;font-size:32px;color:white;font-weight:800;'>2</div></div></CENTER>
+                        </TD>
+                        <TD WIDTH=120>
+                           <CENTER><TABLE BORDER=0 CELLSPACING=0>
+                              <TR>
+                                 <TD><CENTER>
+                                    <div style='background: url(images/sprinklers2.jpg) 0 0; height:39; width:54; overflow: hidden;cursor:pointer;' onClick='incre(2,1);'></div>
+                                    <div style='background: url(images/sprinklers2.jpg) 0 39px; height:39; width:54; overflow: hidden;cursor:pointer;' onClick='incre(2,-1);'></div>
+                                 </CENTER></TD>
+                                 <TD id=rtime2 width=50></TD>
+                              </TR>
+                           </TABLE>
+                            </CENTER>
+                        </TD>
+                        <TD>
+                           <TABLE BORDER=0 WIDTH="100%">
+                              <TR>
+                                 <TD><CENTER>ALL</CENTER></TD>
+                                 <TD><CENTER>MON</CENTER></TD>
+                                 <TD><CENTER>TUE</CENTER></TD>
+                                 <TD><CENTER>WED</CENTER></TD>
+                                 <TD><CENTER>THU</CENTER></TD>
+                                 <TD><CENTER>FRI</CENTER></TD>
+                                 <TD><CENTER>SAT</CENTER></TD>
+                                 <TD><CENTER>SUN</CENTER></TD>
+                              </TR>
+                              <TR>
+                                 <TD><IMG SRC="images/check3.jpg" WIDTH=51 HEIGHT=51 ALIGN=bottom id=cb20 onClick='ccb(2,0);' style='cursor:pointer;'></TD>
+                                 <TD><IMG SRC="images/check3.jpg" WIDTH=51 HEIGHT=51 ALIGN=bottom id=cb21 onClick='ccb(2,1);' style='cursor:pointer;'></TD>
+                                 <TD><IMG SRC="images/check3.jpg" WIDTH=51 HEIGHT=51 ALIGN=bottom id=cb22 onClick='ccb(2,2);' style='cursor:pointer;'></TD>
+                                 <TD><IMG SRC="images/check3.jpg" WIDTH=51 HEIGHT=51 ALIGN=bottom id=cb23 onClick='ccb(2,3);' style='cursor:pointer;'></TD>
+                                 <TD><IMG SRC="images/check3.jpg" WIDTH=51 HEIGHT=51 ALIGN=bottom id=cb24 onClick='ccb(2,4);' style='cursor:pointer;'></TD>
+                                 <TD><IMG SRC="images/check3.jpg" WIDTH=51 HEIGHT=51 ALIGN=bottom id=cb25 onClick='ccb(2,5);' style='cursor:pointer;'></TD>
+                                 <TD><IMG SRC="images/check3.jpg" WIDTH=51 HEIGHT=51 ALIGN=bottom id=cb26 onClick='ccb(2,6);' style='cursor:pointer;'></TD>
+                                 <TD><IMG SRC="images/check3.jpg" WIDTH=51 HEIGHT=51 ALIGN=bottom id=cb27 onClick='ccb(2,7);' style='cursor:pointer;'></TD>
+                              </TR>
+                           </TABLE>
+                            
+                        </TD>
+                     </TR>
+                     <TR>
+                        <TD valign=bottom>
+                           <CENTER><div id =run3 style='width:80px;height:80px;background:url(images/q.gif);cursor:pointer;' onClick='alterd(3);'>
+		<div style='position:relative;top:20px;font-family:Verdana;font-size:32px;color:white;font-weight:800;'>3</div></div></CENTER>
+                        </TD>
+                        <TD WIDTH=120>
+                           <CENTER><TABLE BORDER=0 CELLSPACING=0>
+                              <TR>
+                                 <TD id=rtime3 width=50></TD>
+                                 <TD><CENTER>
+                                    <div style='background: url(images/sprinklers2.jpg) 0 0; height:39; width:54; overflow: hidden;cursor:pointer;' onClick='incre(3,1);'></div>
+                                    <div style='background: url(images/sprinklers2.jpg) 0 39px; height:39; width:54; overflow: hidden;cursor:pointer;' onClick='incre(3,-1);'></div>
+                                 </CENTER></TD>
+                              </TR>
+                           </TABLE>
+                            </CENTER>
+                        </TD>
+                        <TD>
+                           <TABLE BORDER=0 WIDTH="100%">
+                              <TR>
+                                 <TD><CENTER>ALL</CENTER></TD>
+                                 <TD><CENTER>MON</CENTER></TD>
+                                 <TD><CENTER>TUE</CENTER></TD>
+                                 <TD><CENTER>WED</CENTER></TD>
+                                 <TD><CENTER>THU</CENTER></TD>
+                                 <TD><CENTER>FRI</CENTER></TD>
+                                 <TD><CENTER>SAT</CENTER></TD>
+                                 <TD><CENTER>SUN</CENTER></TD>
+                              </TR>
+                              <TR>
+                                 <TD><IMG SRC="images/check3.jpg" WIDTH=51 HEIGHT=51 ALIGN=bottom id=cb30 onClick='ccb(3,0);' style='cursor:pointer;'></TD>
+                                 <TD><IMG SRC="images/check3.jpg" WIDTH=51 HEIGHT=51 ALIGN=bottom id=cb31 onClick='ccb(3,1);' style='cursor:pointer;'></TD>
+                                 <TD><IMG SRC="images/check3.jpg" WIDTH=51 HEIGHT=51 ALIGN=bottom id=cb32 onClick='ccb(3,2);' style='cursor:pointer;'></TD>
+                                 <TD><IMG SRC="images/check3.jpg" WIDTH=51 HEIGHT=51 ALIGN=bottom id=cb33 onClick='ccb(3,3);' style='cursor:pointer;'></TD>
+                                 <TD><IMG SRC="images/check3.jpg" WIDTH=51 HEIGHT=51 ALIGN=bottom id=cb34 onClick='ccb(3,4);' style='cursor:pointer;'></TD>
+                                 <TD><IMG SRC="images/check3.jpg" WIDTH=51 HEIGHT=51 ALIGN=bottom id=cb35 onClick='ccb(3,5);' style='cursor:pointer;'></TD>
+                                 <TD><IMG SRC="images/check3.jpg" WIDTH=51 HEIGHT=51 ALIGN=bottom id=cb36 onClick='ccb(3,6);' style='cursor:pointer;'></TD>
+                                 <TD><IMG SRC="images/check3.jpg" WIDTH=51 HEIGHT=51 ALIGN=bottom id=cb37 onClick='ccb(3,7);' style='cursor:pointer;'></TD>
+                              </TR>
+                           </TABLE>
+                            
+                        </TD>
+                     </TR>
+
+                     <TR id=hid1>
+                        <TD valign=bottom>
+                           <CENTER><div id =run4 style='width:80px;height:80px;background:url(images/one.gif);cursor:pointer;' onClick='alterd(4);'>
+		<div style='position:relative;top:20px;font-family:Verdana;font-size:32px;color:white;font-weight:800;'>4</div></div></CENTER>
+                        </TD>
+                        <TD WIDTH=120>
+                           <CENTER><TABLE BORDER=0 CELLSPACING=0>
+                              <TR>
+                                 <TD><CENTER>
+                                    <div style='background: url(images/sprinklers2.jpg) 0 0; height:39; width:54; overflow: hidden;cursor:pointer;' onClick='incre(4,1);'></div>
+                                    <div style='background: url(images/sprinklers2.jpg) 0 39px; height:39; width:54; overflow: hidden;cursor:pointer;' onClick='incre(4,-1);'></div>
+                                 </CENTER></TD>
+                                 <TD id=rtime4 width=50></TD>
+                                 </TD>
+                              </TR>
+                           </TABLE>
+                            </CENTER>
+                        </TD>
+                        <TD>
+                           <TABLE BORDER=0 WIDTH="100%">
+                              <TR>
+                                 <TD><CENTER>ALL</CENTER></TD>
+                                 <TD><CENTER>MON</CENTER></TD>
+                                 <TD><CENTER>TUE</CENTER></TD>
+                                 <TD><CENTER>WED</CENTER></TD>
+                                 <TD><CENTER>THU</CENTER></TD>
+                                 <TD><CENTER>FRI</CENTER></TD>
+                                 <TD><CENTER>SAT</CENTER></TD>
+                                 <TD><CENTER>SUN</CENTER></TD>
+                              </TR>
+                              <TR>
+                                 <TD><IMG SRC="images/check3.jpg" WIDTH=51 HEIGHT=51 ALIGN=bottom id=cb40 onClick='ccb(4,0);' style='cursor:pointer;'></TD>
+                                 <TD><IMG SRC="images/check3.jpg" WIDTH=51 HEIGHT=51 ALIGN=bottom id=cb41 onClick='ccb(4,1);' style='cursor:pointer;'></TD>
+                                 <TD><IMG SRC="images/check3.jpg" WIDTH=51 HEIGHT=51 ALIGN=bottom id=cb42 onClick='ccb(4,2);' style='cursor:pointer;'></TD>
+                                 <TD><IMG SRC="images/check3.jpg" WIDTH=51 HEIGHT=51 ALIGN=bottom id=cb43 onClick='ccb(4,3);' style='cursor:pointer;'></TD>
+                                 <TD><IMG SRC="images/check3.jpg" WIDTH=51 HEIGHT=51 ALIGN=bottom id=cb44 onClick='ccb(4,4);' style='cursor:pointer;'></TD>
+                                 <TD><IMG SRC="images/check3.jpg" WIDTH=51 HEIGHT=51 ALIGN=bottom id=cb45 onClick='ccb(4,5);' style='cursor:pointer;'></TD>
+                                 <TD><IMG SRC="images/check3.jpg" WIDTH=51 HEIGHT=51 ALIGN=bottom id=cb46 onClick='ccb(4,6);' style='cursor:pointer;'></TD>
+                                 <TD><IMG SRC="images/check3.jpg" WIDTH=51 HEIGHT=51 ALIGN=bottom id=cb47 onClick='ccb(4,7);' style='cursor:pointer;'></TD>
+                              </TR>
+                           </TABLE>
+                            
+                        </TD>
+                     </TR>
+                     <TR id=hid2>
+                        <TD valign=bottom>
+                           <CENTER><div id =run5 style='width:80px;height:80px;background:url(images/one.gif);cursor:pointer;' onClick='alterd(5);'>
+		<div style='position:relative;top:20px;font-family:Verdana;font-size:32px;color:white;font-weight:800;'>5</div></div></CENTER>
+                        </TD>
+                        <TD WIDTH=120>
+                           <CENTER><TABLE BORDER=0 CELLSPACING=0>
+                              <TR>
+                                 <TD id=rtime5
+                                 width=50></TD>
+                                 <TD><CENTER>
+                                    <div style='background: url(images/sprinklers2.jpg) 0 0; height:39; width:54; overflow: hidden;cursor:pointer;' onClick='incre(5,1);'></div>
+                                    <div style='background: url(images/sprinklers2.jpg) 0 39px; height:39; width:54; overflow: hidden;cursor:pointer;' onClick='incre(5,-1);'></div>
+                                 </CENTER></TD>
+                              </TR>
+                           </TABLE>
+                            </CENTER>
+                        </TD>
+                        <TD>
+                           <TABLE BORDER=0 WIDTH="100%">
+                              <TR>
+                                 <TD><CENTER>ALL</CENTER></TD>
+                                 <TD><CENTER>MON</CENTER></TD>
+                                 <TD><CENTER>TUE</CENTER></TD>
+                                 <TD><CENTER>WED</CENTER></TD>
+                                 <TD><CENTER>THU</CENTER></TD>
+                                 <TD><CENTER>FRI</CENTER></TD>
+                                 <TD><CENTER>SAT</CENTER></TD>
+                                 <TD><CENTER>SUN</CENTER></TD>
+                              </TR>
+                              <TR>
+                                 <TD><IMG SRC="images/check3.jpg" WIDTH=51 HEIGHT=51 ALIGN=bottom id=cb50 onClick='ccb(5,0);' style='cursor:pointer;'></TD>
+                                 <TD><IMG SRC="images/check3.jpg" WIDTH=51 HEIGHT=51 ALIGN=bottom id=cb51 onClick='ccb(5,1);' style='cursor:pointer;'></TD>
+                                 <TD><IMG SRC="images/check3.jpg" WIDTH=51 HEIGHT=51 ALIGN=bottom id=cb52 onClick='ccb(5,2);' style='cursor:pointer;'></TD>
+                                 <TD><IMG SRC="images/check3.jpg" WIDTH=51 HEIGHT=51 ALIGN=bottom id=cb53 onClick='ccb(5,3);' style='cursor:pointer;'></TD>
+                                 <TD><IMG SRC="images/check3.jpg" WIDTH=51 HEIGHT=51 ALIGN=bottom id=cb54 onClick='ccb(5,4);' style='cursor:pointer;'></TD>
+                                 <TD><IMG SRC="images/check3.jpg" WIDTH=51 HEIGHT=51 ALIGN=bottom id=cb55 onClick='ccb(5,5);' style='cursor:pointer;'></TD>
+                                 <TD><IMG SRC="images/check3.jpg" WIDTH=51 HEIGHT=51 ALIGN=bottom id=cb56 onClick='ccb(5,6);' style='cursor:pointer;'></TD>
+                                 <TD><IMG SRC="images/check3.jpg" WIDTH=51 HEIGHT=51 ALIGN=bottom id=cb57 onClick='ccb(5,7);' style='cursor:pointer;'></TD>
+                              </TR>
+                           </TABLE>
+                      
+                        </TD>
+                     </TR>
+                     <TR><TD colspan=3><center><br><input type=button name='Save' value='SAVE' style='font-face:Verdana;font-size:28px;' onClick='execut()'></center></TD></TR>
+                  </TABLE>
+                   </CENTER>
+               </TD>
+            </TR>
+            <TR>
+               <TD COLSPAN=2>
+                  <CENTER>&nbsp;</CENTER>
+               </TD>
+            </TR>
+         </TABLE>
+         
+      </TD>
+   </TR>
+</TABLE>
+
+
+
+	</TD>
+    </TR>
+</TABLE>
+<div id=blocaj style=' position:absolute; left:490px; top: 482px;'>
+</div>
+</BODY>
+</HTML>
+
+

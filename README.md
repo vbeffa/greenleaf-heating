@@ -1,7 +1,19 @@
 # Greenleaf Home Automation
 
-Raspberry Pi home automation system for radiant heating, cooling, irrigation, and relay controls.
+Archived Raspberry Pi home automation source, imported from the supplied `html` directory snapshot (November 2026).
 
-The original source snapshot was provided in November 2026. The pending import excludes backup/editor files and compiled CGI programs containing embedded database credentials. The Perl source scripts must read their database password from `GREENLEAF_DB_PASSWORD` rather than storing it in Git.
+## Components
 
-**Caution:** The Summer/Winter interlock and relay-control logic have not been changed or validated on hardware. The source alone is not a deployable Raspberry Pi image.
+- `html/io2db.pl`: minute-by-minute automation loop, including relays, heating, cooling, and irrigation.
+- `html/*.html`: web control and scheduling pages.
+- `html/getAny.cgi` and `html/setAny.cgi`: Perl database-backed CGI endpoints.
+- `html/relays/`: relay-control web UI.
+- `html/css`, `html/js`, `html/images`: static assets.
+
+## Important limitations
+
+This is a source archive, not a deployable system image. The original database, cron jobs, external scripts, hardware settings, and compiled CGI executables are not included. Do not deploy without checking the Raspberry Pi's actual configuration and testing relay behavior.
+
+The original source contained a hardcoded database password. It has been removed from the three Perl source files; set the `GREENLEAF_DB_PASSWORD` environment variable for these processes before running them. The original compiled CGI executables also embedded credentials, and have been omitted rather than committed. They must be rebuilt from verified source if still required.
+
+The Summer/Winter radiant heating interlock remains unchanged. No hardware logic has been modified in this archival import.

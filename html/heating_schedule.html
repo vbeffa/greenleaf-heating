@@ -1,0 +1,339 @@
+<HTML>
+<HEAD>
+<TITLE>heating Schedule</TITLE>
+
+
+<script>
+function getCookie(cname) { var name = cname + "="; var ca = document.cookie.split(';'); for(var i=0; i<ca.length; i++) 
+ {var c = ca[i]; while (c.charAt(0)==' ') c = c.substring(1); if (c.indexOf(name) != -1) return c.substring(name.length,c.length);} return ""; } 
+var loginok = getCookie("loginok");
+var heat11 = null;
+var anum = 0;
+var day = 0;
+var odata = 0;
+var N11 = 11;
+function ceteste()
+{
+	var b = "getAny.cgi?oper=heat&tip=h&x=" + Math.random();
+////id, value, high_temp, start_time1, end_time1, start_time2, end_time2, daily, one_time, z_1, z_2
+	var runok = $.ajax({ url: b, data: "", dataType:"json", async: false }).responseText;
+	heat11 = runok.split("~");
+	//alert(heat11[2] + ',' + heat11[N11 + 2] + ',' + heat11[2 * N11 + 2] + ',' + heat11[3 * N11 + 2] + ',' + heat11[4 * N11 + 2]); 
+	anum = Math.floor(heat11.length / N11);
+	for(var i = 0; i < anum; i++)
+	{
+		var p = N11 * i;
+		if(i == 0)
+		{
+			odata = heat11[p + 8]
+			day = heat11[p + 7];
+		}
+		var k = heat11[p];
+//		if(i == anum - 1)
+//			k = 7;
+		var a = document.getElementById('iy' + k + '0'); 
+		var b = (heat11[p + 9] == '1') ? 'images/check2.jpg' : 'images/check3.jpg';
+		if(a)
+			a.src = b;
+		a = document.getElementById('piz' + k + '6');
+		var w = heat11[p + 2];
+		if(w != null && w.indexOf('.') > 0)
+			w = Math.round(Number(w));
+		if(a)
+			a.value = w;
+		a = document.getElementById('iy' + k + '1');
+		w = heat11[p + 3];
+		if(w != '' && w.length > 5)
+			w = w.substring(0,5);
+		if(a)
+			a.value = w;
+		a = document.getElementById('iy' + k + '2');
+		w = heat11[p + 4];
+		if(w != '' && w.length > 5)
+			w = w.substring(0,5);
+		if(a)
+			a.value = w;
+		a = document.getElementById('ix' + k + '3');
+		b = (heat11[p + 10] == '1') ? 'images/check2.jpg' : 'images/check3.jpg';
+		if(a)
+			a.src = b;
+		a = document.getElementById('ix' + k + '4');
+		w = heat11[p + 5];
+		if(w != '' && w.length > 5)
+			w = w.substring(0,5);
+		if(a)
+			a.value = w;
+		a = document.getElementById('ix' + k + '5');
+		w = heat11[p + 6];
+		if(w != '' && w.length > 5)
+			w = w.substring(0,5);
+		if(a)
+			a.value = w;
+
+	}
+//odata = 1; day = 'Feb 23, 2014';
+	var q2 = document.getElementById('d1');
+	var q3 = (odata == 0) ? 'images/check2.jpg' : 'images/check3.jpg';
+	if(q2)
+		q2.src = q3;
+	var q1 = document.getElementById('d2');
+	q3 = (day == 0) ? 'images/check2.jpg' : 'images/check3.jpg';
+	if(q1)
+		q1.src = q3;
+	//q1 = document.getElementById('d3');
+	//	q1.value = (odata == 0) ? '' : day;
+}
+function cb(ii)
+{
+	if(loginok != 1)
+	{
+		alert("Guest access is limited");
+		return true;
+	}
+	var q1 = document.getElementById('d1');
+	var q2 = document.getElementById('d2');
+//	var q3 = document.getElementById('d3');
+	if(ii == 0)
+	{
+		if(odata == 1)
+		{
+			odata = 0;
+			var q = 'images/check2.jpg';
+			q1.src = q;
+		}
+		else
+		{
+			odata = 1;
+			var q = 'images/check3.jpg';
+			q1.src = q;
+		}
+		for(var i = 0; i < anum; i++)
+		{
+			var p = N11 * i;
+			heat11[p + 8] = odata;
+		}
+	}
+	else	
+	{
+		if(day == 1)
+		{
+			day = 0;
+			var q = 'images/check2.jpg';
+			q2.src = q;
+		}
+		else
+		{
+			day = 1;
+			var q = 'images/check3.jpg';
+			q2.src = q;
+		}
+		for(var i = 0; i < anum; i++)
+		{
+			var p = N11 * i;
+			heat11[p + 7] = day;
+		}
+	}
+}
+function cbb(i, j)
+{
+	if(loginok != 1)
+	{
+		alert("Guest access is limited");
+		return true;
+	}
+	var t = 0;
+	for(t = 0; t < anum; t++)
+	{
+		if(/*t < anum - 1 &&*/ Number(heat11[N11 * t]) == i)
+			break;
+//		if(t == anum - 1) 
+//			break;
+	}
+	var e = '';
+	if(j == 0)
+		e = document.getElementById('iy' + i + '0');
+	else
+		e = document.getElementById('ix' + i + '3');
+	var f = e.src;
+        var g = f.indexOf('images/');
+        if(g > 0)
+                g += 7;
+        g = (f.indexOf('3', g) > 0) ? '1' : '0';
+        var gg = (g == '1') ? 'images/check2.jpg' : 'images/check3.jpg';            
+	e.src = gg;
+	heat11[N11 * t + 9 + j] = g;
+}
+function execut()
+{
+	if(loginok != 1)
+	{
+		alert("Guest access is limited");
+		return true;
+	}
+	var b = "setAny.cgi?oper=heat&tip=w&w=";
+	var s = "";
+	var i = 0;	
+	for(i = 0; i < anum; i++)
+	{
+		var p = N11 * i;
+		var k = heat11[p];
+		if(i == anum - 1)
+			k = i;
+		var a = document.getElementById("iy" + k + "1");
+		heat11[p + 3] = a.value;
+		a = document.getElementById("iy" + k + "2");
+		heat11[p + 4] = a.value;
+		a = document.getElementById("ix" + k + "4");
+		heat11[p + 5] = a.value;
+		a = document.getElementById("ix" + k + "5");
+		heat11[p + 6] = a.value;
+		
+//		a = document.getElementById("d3");
+//		heat11[p + 8] = a.value;
+
+		a = document.getElementById("piz" + k + "6");
+		heat11[p + 2] = a.value;
+	}
+	for(i = 0; i < anum * N11; i++)
+	{
+//actualizaeaza * timestart timestop datestart datestop
+		s += heat11[i] + '~';
+	}
+	b += s;
+//	alert(heat11[2] + ',' + heat11[N11 + 2] + ',' + heat11[2 * N11 + 2] + ',' + heat11[3 * N11 + 2] + ',' + heat11[4 * N11 + 2]); 
+//	alert(b);
+	var runok = $.ajax({ url: b + "&x=" + Math.random(), data: "", dataType:"json", async: false }).responseText;
+	alert(runok);
+}
+function doneok()
+{
+	if(loginok != 1)
+	{
+		$("#dialog-modal").dialog('destroy');
+		location.reload();
+		return true;
+	}
+	execut();
+	$("#dialog-modal").dialog('destroy');
+	location.reload();
+}
+function donecancel()
+{
+	$("#dialog-modal").dialog('destroy');
+}
+</script>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+<CENTER><TABLE BORDER=1 CELLSPACING=0 CELLPADDING=0>
+   <TR>
+      <TD>
+         <CENTER><TABLE BORDER=0 CELLSPACING=3 CELLPADDING=2>
+            <TR>
+               <TD><P>HEATING</P></TD>
+               <TD WIDTH=51><P></P></TD>
+               <TD COLSPAN=2><CENTER>SCHEDULE 1</CENTER></TD><TD><P></P></TD>
+               <TD WIDTH=51><P></P></TD>
+               <TD COLSPAN=2><CENTER>SCHEDULE 2</CENTER></TD>
+               <TD ROWSPAN=3 COLSPAN=2 WIDTH=80 VALIGN=BOTTOM><FONT class=a><CENTER>MAX&nbsp;<BR>TEMP</CENTER></font></TD>
+            </TR>
+            <TR>
+               <TD><P></P></TD>
+               <TD WIDTH=51><P></P></TD>
+               <TD COLSPAN=2><P><IMG SRC="images/graydot.gif" WIDTH=240 HEIGHT=1 ALIGN=bottom></P></TD><TD><P></P></TD>
+               <TD WIDTH=51><P></P></TD>
+               <TD COLSPAN=2><P><IMG SRC="images/graydot.gif" WIDTH=240 HEIGHT=1 ALIGN=bottom></P></TD>
+            </TR>
+            <TR>
+               <TD><P></P></TD>
+               <TD WIDTH=51><P></P></TD><TD><CENTER><font class=a>ON-TIME</font></CENTER></TD>
+               <TD><CENTER><font class=a>OFF-TIME</font></CENTER></TD>
+               <TD><P><IMG SRC="images/cleardot.gif" WIDTH=30 HEIGHT=20 BORDER=0 ALIGN=bottom></P></TD>
+               <TD WIDTH=51><P></P></TD><TD><CENTER><font class=a>ON-TIME</font></CENTER></TD>
+               <TD><P><font class=a>OFF-TIME</font></P></TD>
+            </TR>
+            <TR>
+               <TD><P>LIVING</P></TD>
+               <TD WIDTH=51><P><IMG id=iy30 SRC="images/check2.jpg" WIDTH=51 HEIGHT=51 ALIGN=bottom style='cursor:pointer;' onClick='cbb(3,0);'></P></TD>
+		<TD><CENTER><INPUT TYPE=text id=iy31 VALUE="05:00" SIZE=5 MAXLENGTH=8 style="text-align:center;"></CENTER></TD>
+               <TD><CENTER><INPUT TYPE=text id=iy32 VALUE="08:00" SIZE=5 MAXLENGTH=8 style="text-align:center;"></CENTER></TD>
+               <TD><P></P></TD>
+               <TD WIDTH=51><P><IMG id=ix33 SRC="images/check2.jpg" WIDTH=51 HEIGHT=51 ALIGN=bottom style='cursor:pointer;' onClick='cbb(3,1);'></P></TD>
+		<TD><CENTER><INPUT TYPE=text id=ix34 VALUE="16:00" SIZE=5 MAXLENGTH=8 style="text-align:center;"></CENTER></TD>
+               <TD><P><INPUT TYPE=text id=ix35 VALUE="21:00" SIZE=5 MAXLENGTH=8 style="text-align:center;"></P></TD>
+               <TD WIDTH=40><P ALIGN=right><INPUT id=piz36 TYPE=text VALUE="3" SIZE=1 MAXLENGTH=2 style="text-align:center;"></P></TD>
+               <TD WIDTH=40><P>&#176;F</P></TD>
+            </TR>
+            <TR>
+               <TD><P>MASTER</P></TD>
+               <TD WIDTH=51><P><IMG id=iy40 SRC="images/check2.jpg" WIDTH=51 HEIGHT=51 ALIGN=bottom style='cursor:pointer;' onClick='cbb(4,0);'></P></TD>
+		<TD><CENTER><INPUT TYPE=text id=iy41 VALUE="05:00" SIZE=5 MAXLENGTH=8 style="text-align:center;"></CENTER></TD>
+               <TD><CENTER><INPUT TYPE=text  id=iy42 VALUE="08:00" SIZE=5 MAXLENGTH=8 style="text-align:center;"></CENTER></TD>
+               <TD><P></P></TD>
+               <TD WIDTH=51><P><IMG id=ix43 SRC="images/check2.jpg" WIDTH=51 HEIGHT=51 ALIGN=bottom style='cursor:pointer;' onClick='cbb(4,1);'></P></TD>
+		<TD><CENTER><INPUT TYPE=text id=ix44 VALUE="14:00" SIZE=5 MAXLENGTH=8 style="text-align:center;"></CENTER></TD>
+               <TD><P><INPUT TYPE=text id=ix45 VALUE="21:00" SIZE=5 MAXLENGTH=8 style="text-align:center;"></P></TD>
+               <TD WIDTH=40><P ALIGN=right><INPUT TYPE=text id=piz46 VALUE="4" SIZE=1 MAXLENGTH=2 style="text-align:center;"></P></TD>
+               <TD WIDTH=40><P>&#176;F</P></TD>
+            </TR>
+            <TR>
+               <TD><P>OFFICE</P></TD>
+               <TD WIDTH=51><P><IMG  id=iy60 SRC="images/check3.jpg" WIDTH=51 HEIGHT=51 ALIGN=bottom style='cursor:pointer;' onClick='cbb(6,0);'></P></TD>
+		<TD><CENTER><INPUT TYPE=text id=iy61 VALUE="05:00" SIZE=5 MAXLENGTH=8 style="text-align:center;"></CENTER></TD>
+               <TD><CENTER><INPUT TYPE=text id=iy62 VALUE="08:00" SIZE=5 MAXLENGTH=8 style="text-align:center;"></CENTER></TD>
+               <TD><P></P></TD>
+               <TD WIDTH=51><P><IMG id=ix63 SRC="images/check3.jpg" WIDTH=51 HEIGHT=51 ALIGN=bottom style='cursor:pointer;' onClick='cbb(6,1);'></P></TD>
+		<TD><CENTER><INPUT TYPE=text  id=ix64 VALUE="14:00" SIZE=5 MAXLENGTH=8 style="text-align:center;"></CENTER></TD>
+               <TD><P><INPUT TYPE=text id=ix65 VALUE="19:00" SIZE=5 MAXLENGTH=8 style="text-align:center;"></P></TD>
+               <TD WIDTH=40><P ALIGN=right><INPUT TYPE=text  id=piz66 VALUE="6" SIZE=1 MAXLENGTH=2 style="text-align:center;"></P></TD>
+               <TD WIDTH=40><P>&#176;F</P></TD>
+            </TR>
+            <TR>
+               <TD><P>GUEST</P></TD>
+               <TD WIDTH=51><P><IMG id=iy20 SRC="images/check3.jpg" WIDTH=51 HEIGHT=51 ALIGN=bottom style='cursor:pointer;' onClick='cbb(2,0);'></P></TD>
+		<TD><CENTER><INPUT TYPE=text id=iy21 VALUE="05:00" SIZE=5 MAXLENGTH=8 style="text-align:center;"></CENTER></TD>
+               <TD><CENTER><INPUT TYPE=text id=iy22 VALUE="08:00" SIZE=5 MAXLENGTH=8 style="text-align:center;"></CENTER></TD>
+               <TD><P></P></TD>
+               <TD WIDTH=51><P><IMG  id=ix23 SRC="images/check3.jpg" WIDTH=51 HEIGHT=51 ALIGN=bottom style='cursor:pointer;' onClick='cbb(2,1);'></P></TD>
+		<TD><CENTER><INPUT TYPE=text id=ix24 VALUE="14:00" SIZE=5 MAXLENGTH=8 style="text-align:center;"></CENTER></TD>
+               <TD><P><INPUT TYPE=text id=ix25 VALUE="19:00" SIZE=5 MAXLENGTH=8 style="text-align:center;"></P></TD>
+               <TD WIDTH=40><P ALIGN=right><INPUT TYPE=text id=piz26 VALUE="2" SIZE=1 MAXLENGTH=2 style="text-align:center;"></P></TD>
+               <TD WIDTH=40><P>&#176;F</P></TD>
+            </TR>
+            <TR>
+               <TD><P>BDRM2</P></TD>
+               <TD WIDTH=51><P><IMG id=iy50 SRC="images/check3.jpg" WIDTH=51 HEIGHT=51 ALIGN=bottom style='cursor:pointer;' onClick='cbb(5,0);'></P></TD>
+		<TD><CENTER><INPUT TYPE=text id=iy51 VALUE="05:00" SIZE=5 style="text-align:center;"></CENTER></TD>
+               <TD><CENTER><INPUT TYPE=text id=iy52 VALUE="08:00" SIZE=5 MAXLENGTH=8 style="text-align:center;"></CENTER></TD>
+               <TD><P></P></TD>
+               <TD WIDTH=51><P><IMG id=ix53 SRC="images/check3.jpg" WIDTH=51 HEIGHT=51 ALIGN=bottom style='cursor:pointer;' onClick='cbb(5,1);'></P></TD>
+		<TD><CENTER><INPUT TYPE=text id=ix54 VALUE="14:00" SIZE=5 MAXLENGTH=8 style="text-align:center;"></CENTER></TD>
+               <TD><P><INPUT TYPE=text id=ix55 VALUE="19:00" SIZE=5 MAXLENGTH=8 style="text-align:center;"></P></TD>
+               <TD WIDTH=40><P ALIGN=right><INPUT TYPE=text id=piz56 VALUE="5" SIZE=1 MAXLENGTH=2 style="text-align:center;"></P></TD>
+               <TD WIDTH=40><P>&#176;F</P></TD>
+            </TR>
+
+
+            <TR>
+               <TD><P></P></TD>
+               <TD WIDTH=51><P><IMG SRC="" id=d1 WIDTH=51 HEIGHT=51 ALIGN=bottom style='cursor:pointer;' onClick='cb(0);'></P></TD><TD><P>DAILY</P></TD><TD><P></P></TD><TD><P></P></TD>
+               <TD WIDTH=51><P><IMG SRC="" id=d2 WIDTH=51 HEIGHT=51 ALIGN=bottom style='cursor:pointer;' onClick='cb(1);'></P></TD><TD><P>ONCE </P></TD>
+               <TD COLSPAN=2><P><!--INPUT TYPE=text id=d3 VALUE="" SIZE=10 MAXLENGTH=11 style="text-align:center;"--></P></TD>
+               <TD WIDTH=40><P></P></TD>
+            </TR>
+            <TR>
+               <TD><P></P></TD>
+               <TD WIDTH=51><P></P></TD><TD><P><INPUT TYPE=button NAME=Submit VALUE="SUBMIT" style="text-align:center;" onClick='doneok();'></P></TD><TD><P></P></TD><TD><P></P></TD>
+               <TD WIDTH=51><P></P></TD><TD><P><INPUT TYPE=button NAME=Submit VALUE="CANCEL" style="text-align:center;" onClick='donecancel();'></P></TD><TD><P></P></TD>
+               <TD WIDTH=40><P></P></TD>
+               <TD WIDTH=40><P></P></TD>
+            </TR>
+          </TABLE>
+          </CENTER>
+      </TD>
+   </TR>
+</TABLE></CENTER>
+</BODY>
+<script>
+ceteste();
+</script>
+</HTML>

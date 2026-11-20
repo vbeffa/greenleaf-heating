@@ -1,0 +1,52 @@
+<HTML>
+<HEAD>
+<TITLE>20917 Greenleaf</TITLE>
+<style>
+body, button, input, label, h3, td, p {font-family: Verdana; font-size: 18pt;}
+.aa {font-family: Verdana; font-size: 14pt;}
+</style>
+<script src="js/jquery.js"></script>
+<script>
+function f_login()
+{
+	if(!$("#un").val())
+	{
+		alert("Please enter your name"); $("#un").focus(); return;
+	}
+	if(!$("#em").val() || !$("#em").val().indexOf("@") < 0)
+	{
+		alert("Please enter Email address"); $("#em").focus(); return;
+	}
+	var logok = $.ajax({ type: "GET", url: "email.cgi?u=" + $("#un").val() + "&e=" + $("#em").val() + "&c=" + $("#content").val() + "&x=" + Math.random(), data: "", dataType:"text",  async: false }).responseText;
+//	alert(logok);
+	document.location = 'init.html';
+}
+</script>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+<P><TABLE BORDER=0 CELLSPACING=0 CELLPADDING=0>
+	<TR><TD WIDTH=1200><P><IMG SRC="images/cleardot.gif" WIDTH=20 HEIGHT=20 BORDER=0 ALIGN=bottom></P></TD></TR>
+	<TR>
+		<TD WIDTH=1200>
+			<CENTER><TABLE BORDER=0 CELLSPACING=0 WIDTH="100%">
+				<TR>
+					<TD VALIGN=bottom><CENTER>20917 GREENLEAF&nbsp;DR</CENTER></TD>
+					<TD><P ALIGN=right>Your name:&nbsp;</P></TD>
+					<TD><P><INPUT TYPE=text NAME=name placeholder="" id=un SIZE=20 MAXLENGTH=32 style="font-size:24pt;"></P></TD>
+				</TR>
+				<TR>
+					<TD VALIGN=top><CENTER>CUPERTINO,&nbsp;CA&nbsp;95014</CENTER></TD>
+					<TD><P ALIGN=right>Your email:&nbsp;</P></TD>
+					<TD><P><INPUT TYPE=text NAME=email placeholder="" id=em SIZE=20 MAXLENGTH=32 style="font-size:24pt;"></P></TD>
+				</TR>
+			</TABLE>
+			 </CENTER>
+		</TD>
+	</TR>
+	<TR><TD WIDTH=1200><CENTER><TEXTAREA NAME=name id=content ROWS=4 COLS=30 WRAP=virtual style="font-size:20pt;">Please send me more information about this project</TEXTAREA></CENTER></TD></TR>
+	<TR><TD WIDTH=1200><P></P></TD></TR>
+	<TR><TD WIDTH=1200><CENTER><INPUT TYPE=button NAME=Submit VALUE="SUBMIT" onClick='f_login()'></CENTER></TD></TR>
+</TABLE>
+</P>
+</BODY>
+</HTML>

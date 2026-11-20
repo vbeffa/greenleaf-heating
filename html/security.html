@@ -1,0 +1,115 @@
+<HTML>
+<HEAD>
+<TITLE>20917 Greenleaf</TITLE>
+<style>
+body, tr, td, input, select, p, div { font-family: Verdana; font-size: 13pt;};
+</style>
+<script src="js/jquery.min.js" type="text/javascript"></script>
+<script>
+var loop = 0;
+var pir = [ -1, 0, 0, 0, 0, 0, 0, 0, 0, 0 ];
+function ceteste()
+{
+	var b = "getAny.cgi?oper=pir&x=" + Math.random();
+	var runok = $.ajax({ url: b, data: "", dataType:"json", async: false }).responseText;
+	var ob = runok.split("~");
+	for(var i = 0; i < ob.length; i += 2)
+	{
+		var k = ob[i];
+		if(pir[k] != ob[i + 1])
+		{
+			pir[k] = ob[i + 1];
+			var b = 'images/sensor.gif';
+			if(pir[k] != 0)
+				b = 'images/sensor_animated.gif';
+			var a = document.getElementById('p' + k);
+			if(a)
+				a.src = b;
+		}
+	}
+}
+var activa = 3;
+var v_activa;
+function initb()
+{
+	v_activa = document.getElementById("alfa");
+	if(v_activa)
+	{
+		v_activa.style.background = "#cdcdcd";
+		v_activa.style.cursor = "";
+	}
+}
+function changeA(o, i)
+{
+	var a = [ "home.html", "heating.html", "__cooling.html", "security.html", "irrigation.html", "setup.html", "__contact.html", "docs.html" ];
+	if(i != activa)
+	{
+		if(v_activa)
+		{
+			v_activa.style.background = "#efefef";
+			v_activa.style.cursor = "pointer";
+		}
+		o.style.background = "#cdcdcd";
+		o.style.cursor = "";
+		activa = i;
+		v_activa = o;
+		document.location = a[activa];
+	}
+}
+setInterval(ceteste, 500);
+</script>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF" leftmargin=0 topmargin=0 onLoad='initb();ceteste();'>
+<P><TABLE BORDER=0 CELLSPACING=0 CELLPADDING=0>
+   <TR>
+      <TD WIDTH=1130>
+         <CENTER><TABLE BORDER=1 CELLSPACING=0 CELLPADDING=2 WIDTH="100%">
+            <TR>
+               <TD onClick='changeA(this, 0)' style='cursor:pointer; background-color: #efefef;'><CENTER>HOME</CENTER></TD>
+               <TD onClick='changeA(this, 1)' style='cursor:pointer; background-color: #efefef;'><CENTER>CLIMATE</CENTER></TD>
+               <TD onClick='changeA(this, 3)' id=alfa style='cursor:pointer; background-color: #efefef;'><CENTER>SECURITY</CENTER></TD>
+               <TD onClick='changeA(this, 4)' style='cursor:pointer; background-color: #efefef;'><CENTER>IRRIGATION</CENTER></TD>
+               <TD onClick='changeA(this, 5)' style='cursor:pointer; background-color: #efefef;'><CENTER>SETTINGS</CENTER></TD>
+               <TD onClick='changeA(this, 7)' style='cursor:pointer; background-color: #efefef;'><CENTER>DOCS</CENTER></TD>
+            </TR>
+         </TABLE>
+          </CENTER>
+      </TD>
+   </TR>
+   <TR>
+      <TD WIDTH=1130>
+
+
+
+<P><TABLE BORDER=0 CELLSPACING=0 CELLPADDING=0>
+	<TR>
+		<TD WIDTH=1200>
+			<CENTER><TABLE BORDER=0 CELLSPACING=0 CELLPADDING=0 WIDTH=983 HEIGHT=648 BACKGROUND="images/Floorplan1.jpg">
+				<TR>
+					<TD>
+					<P>
+					<IMG id=p1 SRC="images/sensor.gif" WIDTH=45 HEIGHT=45 ALIGN=bottom style="position:relative; TOP:-220px; LEFT:165px; WIDTH:45px; HEIGHT:45px">
+					<IMG id=p4 SRC="images/sensor.gif" WIDTH=45 HEIGHT=45 ALIGN=bottom style="position:relative; TOP:10px; LEFT:10px; WIDTH:45px; HEIGHT:45px">
+					<IMG id=p2 SRC="images/sensor.gif" WIDTH=45 HEIGHT=45 ALIGN=bottom style="position:relative; TOP:-40px; LEFT:60px; WIDTH:45px; HEIGHT:45px">
+					<IMG id=p6 SRC="images/sensor.gif" WIDTH=45 HEIGHT=45 ALIGN=bottom style="position:relative; TOP:210px; LEFT:-65px; WIDTH:45px; HEIGHT:45px">
+					<IMG id=p7 SRC="images/sensor.gif" WIDTH=45 HEIGHT=45 ALIGN=bottom style="position:relative; TOP:210px; LEFT:75px; WIDTH:45px; HEIGHT:45px">
+					<IMG id=p3 SRC="images/sensor.gif" WIDTH=45 HEIGHT=45 ALIGN=bottom style="position:relative; TOP:-90px; LEFT:220px; WIDTH:45px; HEIGHT:45px">
+					<IMG id=p5 SRC="images/sensor.gif" WIDTH=45 HEIGHT=45 ALIGN=bottom style="position:relative; TOP:-60px; LEFT:415px; WIDTH:45px; HEIGHT:45px">
+					</P>
+					</TD>
+				</TR>
+			</TABLE>
+			</CENTER>
+		</TD>
+	</TR>
+</TABLE>
+</P>
+
+
+
+	</TD>
+    </TR>
+</TABLE>
+</BODY>
+</HTML>
+

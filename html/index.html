@@ -1,0 +1,109 @@
+<html>
+<head> 
+<style>
+body, button, input, label, h3, td, p {font-family: Verdana; font-size: 13pt;}
+.aa {font-family: Verdana; font-size: 12pt;}
+</style>
+   <TITLE>20917 Greenleaf</TITLE>
+<script src="js/jquery.js"></script>
+<script>
+function getCookie(cname) { var name = cname + "="; var ca = document.cookie.split(';'); for(var i=0; i<ca.length; i++) 
+ {var c = ca[i]; while (c.charAt(0)==' ') c = c.substring(1); if (c.indexOf(name) != -1) return c.substring(name.length,c.length);} return ""; } 
+function setCookie(cname, cvalue, exdays) { var d = new Date(); d.setTime(d.getTime() + (exdays*24*60*60*1000));
+ var expires = "max-age=31536000"/*+d.toGMTString()*/; document.cookie = cname + "=" + cvalue + "; " + expires;}
+function f_login(u)
+{
+	var v = 1;
+	if($("#un").val() == '' && $("#pass").val() == '')
+	{
+		setCookie("username", "guest");
+		setCookie("passwd", "guest");
+		setCookie("loginok", "0");
+		v = 0;
+	}
+	var a = document.getElementById("err");
+	if(v == 1)
+	{
+		var logok = $.ajax({ type: "GET", url: "getAny.cgi?oper=log&u=" + $("#un").val() + "&p=" + $("#pass").val() + "&x=" + Math.random(), data: "", dataType:"text", async: false }).responseText;
+		if(logok.indexOf("Login error") >= 0)
+		{
+			a.style.visibility = "visible";
+			a.innerHTML = "<h1><font color=#ccaaaa>Login ERROR.</font></h1>";
+		}
+		else
+		{
+			setCookie("username", $("#un").val());
+			setCookie("passwd", $("#pass").val());
+			setCookie("loginok", "1");
+		}
+		document.location = 'home.html';
+	}
+	else
+	{
+		document.location = 'home.html';
+	}
+}
+function inita()
+{
+	var l = getCookie("login");
+	if(l == '1' || (getCookie("username") == "guest" && getCookie("passwd") == "guest"))
+		document.location = 'home.html';
+}
+</script>
+</head> 
+
+<body leftmargin= 0 topmargin=0 onLoad=inita()> 
+
+<TABLE BORDER=0 CELLSPACING=0 CELLPADDING=0>
+
+   <TR>
+      <TD WIDTH=1130><CENTER>
+	<TABLE BORDER=0 CELLSPACING=0 CELLPADDING=0 WIDTH="100%">
+            <TR>
+               <TD>
+                  <CENTER><TABLE BORDER=0 CELLSPACING=0>
+                     <TR>
+                        <TD>
+                           <font class=aa>20917 GREENLEAF&nbsp;DR</font>
+                        </TD>
+                     </TR>
+                     <TR>
+                        <TD>
+                           <font class=aa>CUPERTINO,&nbsp;CA&nbsp;95014</font>
+                        </TD>
+                     </TR>
+                  </TABLE>
+                  </FONT></CENTER>
+               </TD>
+               <TD>
+                  <P><IMG SRC="images/cleardot.gif" WIDTH=60 HEIGHT=20 BORDER=0 ALIGN=bottom></P>
+               </TD>
+               <TD>
+                  <P ALIGN=right>USERNAME:&nbsp;</P>
+               </TD>
+               <TD>
+                  <P><INPUT TYPE=text NAME=username id="un" placeholder="guest" SIZE=12 MAXLENGTH=20 style="font-size:16pt;"></P>
+               </TD>
+               <TD>
+                  <P ALIGN=right>PASSWORD:&nbsp;</P>
+               </TD>
+               <TD>
+                  <P><INPUT TYPE=password NAME=pwd id="pass" placeholder="guest" SIZE=12 MAXLENGTH=20 style="font-size:16pt;"></P>
+               </TD>
+            </TR>
+         </TABLE></CENTER>
+   	</TD>
+    </TR>
+   <TR>
+      <TD WIDTH=1130><BR><BR>
+         <CENTER><MAP NAME=map1>
+            <AREA SHAPE=rect COORDS="500,170,590,280" NOHREF onClick='f_login();' href='javascript:void(0);'>
+         </MAP><IMG USEMAP="#map1" SRC="images/StreetView.jpg" BORDER=0 ALIGN=bottom></CENTER>
+      </TD>
+   </TR>
+   <TR><TD WIDTH=1130><CENTER><IMG SRC="images/cleardot.gif" WIDTH=30 HEIGHT=30 BORDER=0 ALIGN=bottom>Click on the front door to ENTER</CENTER></TD></TR>
+   <TR><TD WIDTH=1130><CENTER>If you want more information about this project click <A HREF="a_contact.html">HERE</A></CENTER></TD></TR>
+</TABLE>
+</BODY>
+</HTML>
+

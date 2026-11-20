@@ -1,0 +1,272 @@
+<HTML>
+<HEAD>
+<TITLE>20917 Greenleaf</TITLE>
+<style>
+body {font-family:Verdana; font-size: 20pt; color:#f00; }
+div {font-family:Verdana; font-size: 24pt; color:#f00; }
+.a1 {font-family:Verdana; font-size: 18pt; color:#555; }
+</style>
+<link rel="stylesheet" href="css/jquery-ui.css" type="text/css" media="all" />
+<link rel="stylesheet" href="css/ui.theme.css" type="text/css" media="all" />
+<script src="js/jquery.min.js" type="text/javascript"></script>
+<script src="js/jquery-ui.min.js" type="text/javascript"></script>
+<script>
+function getCookie(cname) { var name = cname + "="; var ca = document.cookie.split(';'); for(var i=0; i<ca.length; i++) 
+ {var c = ca[i]; while (c.charAt(0)==' ') c = c.substring(1); if (c.indexOf(name) != -1) return c.substring(name.length,c.length);} return ""; } 
+var loginok = getCookie("loginok");
+var loop = 0;
+var heat = null;
+var num = 0;
+//if(loginok == 1)
+//	window.onbeforeunload = execut;
+var pornit = 0;
+var st1 = 0;
+var idleTime = 0;
+var idleInterval = setInterval(timerIncrement, 1000);
+var N = 3;
+var nrsec = 1;
+var cumnecum = 0;
+function ceteste()
+{
+	var b = "getCOOL.cgi?x=" + Math.random();
+	var runok = $.ajax({ url: b, data: "", dataType:"json", async: false }).responseText;
+	heat = runok.split("~");
+	num = Math.floor(heat.length / N);
+	for(var i = 0; i < num; i++)
+	{
+		var k = heat[N * i];
+		var a = document.getElementById('ix' + k + '1');
+		if(a)
+		{
+			var w = heat[N * i + 1];
+			if(w.indexOf('.') > 0)
+				w = Math.round(w);
+			a.innerHTML = w + "&#176;";
+		}
+		a = document.getElementById('ix' + k + '2'); 
+		if(a)
+		{
+			if(Number(heat[N * i + 2]) < Number(heat[N * i + 1]))
+				a.style.backgroundImage = 'url(images/thermostat_dn.gif)';
+			else
+				a.style.backgroundImage = 'url(images/thermostat.gif)';
+		}
+	}
+	b = "getHEAT.cgi?sp=" + Math.random();
+	var runok1 = $.ajax({ url: b, data: "", dataType:"json", async: false }).responseText;
+	var h1 = runok1.split("~");
+	a = document.getElementById('ia1');
+	if(a)
+	{
+		var w = h1[0];
+		if(w.indexOf('.') > 0)
+			w = Math.round(w);
+		a.innerHTML = w + "&#176;";
+	}
+	a = document.getElementById('ia2');
+	if(a)
+	{
+		var w = h1[1];
+		if(w.indexOf('.') > 0)
+			w = Math.round(w);
+		a.innerHTML = w + "&#176;";
+	}
+	a = document.getElementById('ia3');
+	if(a)
+	{
+		var w = h1[2];
+		if(w.indexOf('.') > 0)
+			w = Math.round(w);
+		a.innerHTML = w + "&#176;";
+	}
+}
+function incre(i, inc)
+{
+	if(loginok != 1)
+	{
+		alert("Guest access is limited");
+		return true;
+	}
+	var k = 0;
+	for(k = 0; k < num; k++)
+		if(Number(heat[N * k]) == i)
+			break;
+	if(k < num)
+	{
+		var l = Number(heat[N * k + 2]); 
+		l += inc; 
+		var a = document.getElementById('ix' + i + '1');
+		if(a)
+		if(l < 40)
+			l = 40;
+		if(l > 80)
+			l = 80;
+		heat[N * k + 2] = "" + l;
+		a = document.getElementById('ix' + i + '2');
+		if(a)
+		{
+			if(Number(heat[N * k + 2]) < Number(heat[N * k + 1]))
+				a.style.backgroundImage = 'url(images/thermostat_dn.gif)';
+			else
+				a.style.backgroundImage = 'url(images/thermostat.gif)';
+		}
+		{
+			var w = heat[N * k + 2];
+			if(w.indexOf('.') > 0)
+				w = Math.round(w);
+			var b = document.getElementById('ix' + i + '1');
+			b.innerHTML = w + "&#176;";
+		}
+		execut(i);
+	}
+
+}
+function execut(i)
+{
+	if(loginok != 1)
+		return true;
+	var k = 0;
+	for(k = 0; k < num; k++)
+		if(Number(heat[N * k]) == i)
+			break;
+	if(k < num)
+	{
+		var b = "setCOOL.cgi?s=";
+		var s = "";
+		s += heat[k * N] + '~' + heat[k * N + 2] + '~';
+		b += s;
+		var runok = $.ajax({ url: b + "&x=" + Math.random(), data: "", dataType:"text", async: false }).responseText;
+	}
+}
+function timerIncrement() 
+{
+	idleTime = idleTime + 1;
+	if (idleTime > nrsec && pornit > 0 && cumnecum == 0) 
+	{
+		var a = document.getElementById("ix" + pornit + "1");
+		if(a)
+		{
+			var w = heat[N * st1 + 1];
+			if(w.indexOf('.') > 0)
+				w = Math.round(w);
+			a.innerHTML = w + "&#176;";
+			a.style.color = "#f00";
+		}
+		pornit = 0;
+		st1 = 0;
+	}
+	if(pornit == 0)
+		idleTime = 0;
+}
+function arata(i)
+{
+	if(i > 0 && pornit == 0)
+	{
+		var k = 0;
+		for(k = 0; k < num; k++)
+			if(Number(heat[N * k]) == i)
+				break;
+		var a = document.getElementById("ix" + i + "1");
+		if(a)
+		{//
+			var w = heat[N * k + 2];
+			if(w.indexOf('.') > 0)
+				w = Math.round(w);
+			a.innerHTML = w + "&#176;";
+			a.style.color = "#00f";
+			st1 = k;
+			pornit = i;
+		}
+	}
+}
+function aratax(i, cum)
+{
+	cumnecum = cum;
+	if(cum == 0)
+		return;
+	if(i > 0 && pornit == 0)
+	{
+		var k = 0;
+		for(k = 0; k < num; k++)
+			if(Number(heat[N * k]) == i)
+				break;
+		var a = document.getElementById("ix" + i + "1");
+		if(a)
+		{//
+			var w = heat[N * k + 2];
+			if(cum == 0)
+				w = heat[N * k + 1];
+			if(w.indexOf('.') > 0)
+				w = Math.round(w);
+			a.innerHTML = w + "&#176;";
+			if(cum == 1)
+				a.style.color = "#00f";
+			else
+				a.style.color = "#f00";
+			st1 = k;
+			if(cum == 1)
+				pornit = i;
+			else
+				pornit = -1;
+		}
+	}
+}
+//setInterval(ceteste, 1000);
+</script>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF" leftmargin=0 topmargin=0 onLoad='ceteste();'>
+<P><TABLE BORDER=0 CELLSPACING=0 CELLPADDING=0>
+	<TR>
+		<TD WIDTH=1200>
+			<CENTER><TABLE BORDER=0 CELLSPACING=0 CELLPADDING=0 WIDTH=983 HEIGHT=648 BACKGROUND="images/Floorplan1.jpg">
+				<TR>
+					<TD><DIV style='width:100px;'>
+					<DIV style='position:relative; TOP:-40px; LEFT:165px;'>
+						<!-- guest -->
+						<div id=ix20 style='background: url(images/thermostat.gif) 0 0; height:25; width:54; overflow: hidden;cursor:pointer;' onClick='incre(2,1);' onmouseover='aratax(2, 1)' onmouseout='aratax(2, 0)'></div>
+						<div id=ix21 style='cursor:pointer; width:200px; margin-left: -75px; text-align:center;' onmouseover='aratax(2, 1)' onmouseout='aratax(2, 0)'>68&#176;</div>
+						<div id=ix22 style='background: url(images/thermostat.gif) 0 25px; height:25; width:54; overflow: hidden;cursor:pointer;' onClick='incre(2,-1);' onmouseover='aratax(2, 1)' onmouseout='aratax(2, 0)'></div>
+					</DIV>
+					<DIV style='position:relative; TOP:300px; LEFT:85px;'>
+						<!-- bdrm2 -->
+						<div id=ix50 style='background: url(images/thermostat.gif) 0 0; height:25; width:54; overflow: hidden;cursor:pointer;' onClick='incre(5,1);' onmouseover='aratax(5, 1)' onmouseout='aratax(5,0)'></div>
+						<div id=ix51 style='cursor:pointer; width:200px; margin-left: -75px; text-align:center;' onmouseover='aratax(5, 1)' onmouseout='aratax(5,0)'>69&#176;</div>
+						<div id=ix52 style='background: url(images/thermostat.gif) 0 25px; height:25; width:54; overflow: hidden;cursor:pointer;' onClick='incre(5,-1);' onmouseover='aratax(5, 1)' onmouseout='aratax(5,0)'></div>
+					</DIV>
+					<DIV style='position:relative; TOP:210px; LEFT:250px;'>
+						<!-- office -->
+						<div id=ix60 style='background: url(images/thermostat.gif) 0 0; height:25; width:54; overflow: hidden;cursor:pointer;' onClick='incre(6,1);' onmouseover='aratax(6, 1)' onmouseout='aratax(6, 0)'></div>
+						<div id=ix61 style='cursor:pointer; width:200px; margin-left: -75px; text-align:center;' onmouseover='aratax(6, 1)' onmouseout='aratax(6, 0)'>70&#176;</div>
+						<div id=ix62 style='background: url(images/thermostat.gif) 0 25px; height:25; width:54; overflow: hidden;cursor:pointer;' onClick='incre(6,-1);' onmouseover='aratax(6, 1)' onmouseout='aratax(6, 0)'></div>
+					</DIV>
+					<DIV style='position:relative; TOP:-150px; LEFT:450px;'>
+						<!-- living -->
+						<div id=ix30 style='background: url(images/thermostat.gif) 0 0; height:25; width:54; overflow: hidden;cursor:pointer;' onClick='incre(3,1);' onmouseover='aratax(3, 1)' onmouseout='aratax(3, 0)'></div>
+						<div id=ix31 style='cursor:pointer; width:200px; margin-left: -75px; text-align:center;' onmouseover='aratax(3, 1)' onmouseout='aratax(3, 0)'>71&#176;</div>
+						<div id=ix32 style='background: url(images/thermostat.gif) 0 25px; height:25; width:54; overflow: hidden;cursor:pointer;' onClick='incre(3,-1);' onmouseover='aratax(3, 1)' onmouseout='aratax(3, 0)'></div>
+					</DIV>
+					<DIV style='position:relative; TOP:-200px; LEFT:700px;'>
+						<!-- master -->
+						<div id=ix40 style='background: url(images/thermostat.gif) 0 0; height:25; width:54; overflow: hidden;cursor:pointer;' onClick='incre(4,1);' onmouseover='aratax(4, 1)' onmouseout='aratax(4, 0)'></div>
+						<div id=ix41 style='cursor:pointer; width:200px; margin-left: -75px; text-align:center;' onmouseover='aratax(4, 1)' onmouseout='aratax(4, 0)'>72&#176;</div>
+						<div id=ix42 style='background: url(images/thermostat.gif) 0 25px; height:25; width:54; overflow: hidden;cursor:pointer;' onClick='incre(4,-1);' onmouseover='aratax(4, 1)' onmouseout='aratax(4, 0)'></div>
+					</DIV>
+					</DIV></TD>
+				</TR>
+			</TABLE>
+			</CENTER>
+			<div style="position:absolute; TOP:480px; LEFT:526px; ">
+				<table cellspacing=0 cellpadding=1 style='border: 1px solid #aaa;'>
+					<tr><td class=a1>ATTIC</td><td id=ia1 style='border-left: 1px solid #aaa;' class=a1>72&#176;</td></tr>
+					<tr><td class=a1>LOCAL</td><td id=ia2 style='border-left: 1px solid #aaa;' class=a1>72&#176;</td></tr>
+					<tr><td class=a1>OUTDOOR</td><td id=ia3 style='border-left: 1px solid #aaa;' class=a1>72&#176;</td></tr>
+				</table>
+			</div>
+		</TD>
+	</TR>
+</TABLE>
+</P>
+</BODY>
+</HTML>
+
+
