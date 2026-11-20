@@ -885,9 +885,8 @@ $qh1->execute();
 $qh1->bind_columns(undef,  \$heating, \$cooling, \$summer_time, \$winter_time);
 $qh1->fetch();
 
-if ($winter_time == 1) {goto WINTER;}
-if ($summer_time == 1) {goto SUMMER;}
-
+# Radiant heat operates independently of the duct airflow season.
+# Always evaluate radiant zones and their relay/boiler safety delay.
 WINTER:
 
 if ($heating == 0) 			# turn off all flags and heat relays
@@ -1150,7 +1149,9 @@ while($qh1->fetch())
    dosql($c);
 }
 
-goto END;	# END when WINTER
+# The ducted cooling system remains gated by Summer airflow mode.
+# Radiant heating above runs in either mode.
+if ($summer_time != 1) { goto END; }
 
 SUMMER:		# Summe and cooling is ON
 # print "Summer time: $winter_time, summer time = $summer_time, heating = $heating, cooling = $cooling\n";
@@ -1192,6 +1193,17 @@ for ($i = 1; $i <= 8; $i++)
       $z_2[$i] 		= $v14; 
     }
   }
+
+# Never request ducted cooling in a zone currently calling for radiant heat.
+# Heat zone IDs are one less than the corresponding AC zone IDs.
+my @radiant_active = (0, 0, 0, 0, 0, 0);
+my $radiant_query = $dbh->prepare("select id, value from heat where id between 1 and 5");
+$radiant_query->execute();
+my ($radiant_id, $radiant_value);
+$radiant_query->bind_columns(undef, \$radiant_id, \$radiant_value);
+while ($radiant_query->fetch()) {
+   $radiant_active[$radiant_id] = $radiant_value;
+}
 
 ##############################################
 # SECTION 6.2: Compute ac requests, write flags to "ac" table
@@ -1242,9 +1254,10 @@ for ($i = 2; $i <= 6; $i++)   # Process Guest Living Master Bdrm2 Office for ac
       )
    )
 
-   {			# turn ac on for zone $i
-      dosql("update ac set value = 1 where id = $i");
-      $h_v[$i-1] = 1; 
+   {                      # only cool if radiant heat is not active in this zone
+      my $ac_requested = $radiant_active[$i-1] ? 0 : 1;
+      dosql("update ac set value = $ac_requested where id = $i");
+      $h_v[$i-1] = $ac_requested;
    }
 else            	# turn ac off
    {
