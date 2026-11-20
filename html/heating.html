@@ -26,7 +26,9 @@ var N = 4;
 var nrsec = 1;
 var cumnecum = 0;
 var um = [ '1','1','1','','1','1','','','','','' ];
-var winter = 0;
+// This page edits radiant heating setpoints independently of duct airflow.
+// Cooling has its own settings page; retain the existing heating setpoint path.
+var winter = 1;
 //statusu: 5 pentru iarna, 5 pentru vara si 1 pentru navien
 var statusu = [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ];
 function ceteste()
@@ -68,11 +70,8 @@ function ceteste()
 	if(um[7] == '1')
 	{
 		b7 += "SUMMER";
-		b8 = 'COOLING: ';
-		if(um[8] == '1')
-			b8 += 'ON';
-		else
-			b8 += 'OFF';
+		b8 = 'RADIANT HEATING: ' + (um[5] == '1' ? 'ON' : 'OFF') +
+			' / COOLING: ' + (um[8] == '1' ? 'ON' : 'OFF');
 	}
 	a7.innerHTML = b7 + '<br>' + b8;
 
